@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sky Strike - 飞机大战</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="game-canvas" width="480" height="720"></canvas>
+
+    <div id="ui-layer">
+      <!-- 主菜单 -->
+      <div id="main-menu" class="screen active">
+        <div class="title-wrap">
+          <h1 class="game-title">SKY STRIKE</h1>
+          <p class="subtitle">星 空 歼 灭 战</p>
+          <div class="title-deco"></div>
+        </div>
+        <div class="menu-buttons">
+          <button class="cyber-btn primary" data-action="start">开 始 游 戏</button>
+          <button class="cyber-btn" data-action="endless">无 尽 模 式</button>
+          <button class="cyber-btn" data-action="bossrush">BOSS RUSH</button>
+          <button class="cyber-btn" data-action="aircraft">战 机 选 择</button>
+          <button class="cyber-btn" data-action="leaderboard">排 行 榜</button>
+          <button class="cyber-btn" data-action="settings">设 置</button>
+        </div>
+        <div class="footer-info">
+          <span>v1.0.0</span>
+          <button id="sound-toggle" class="icon-btn" title="音效开关">🔊</button>
+        </div>
+      </div>
+
+      <!-- 关卡选择 -->
+      <div id="level-select" class="screen">
+        <h2 class="screen-title">选 择 关 卡</h2>
+        <div class="level-grid" id="level-grid"></div>
+        <button class="cyber-btn back-btn" data-action="back-menu">← 返 回</button>
+      </div>
+
+      <!-- 战机选择 -->
+      <div id="aircraft-select" class="screen">
+        <h2 class="screen-title">战 机 选 择</h2>
+        <div class="aircraft-list" id="aircraft-list"></div>
+        <button class="cyber-btn back-btn" data-action="back-menu">← 返 回</button>
+      </div>
+
+      <!-- 排行榜 -->
+      <div id="leaderboard" class="screen">
+        <h2 class="screen-title">排 行 榜</h2>
+        <div class="score-list" id="score-list"></div>
+        <button class="cyber-btn back-btn" data-action="back-menu">← 返 回</button>
+      </div>
+
+      <!-- 设置 -->
+      <div id="settings" class="screen">
+        <h2 class="screen-title">设 置</h2>
+        <div class="settings-list">
+          <div class="setting-item">
+            <label>音效</label>
+            <label class="switch">
+              <input type="checkbox" id="setting-sound" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <label>难度</label>
+            <select id="setting-difficulty" class="cyber-select">
+              <option value="easy">简单</option>
+              <option value="normal" selected>普通</option>
+              <option value="hard">困难</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>自动射击</label>
+            <label class="switch">
+              <input type="checkbox" id="setting-autofire" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="controls-info">
+          <h3>操 作 说 明</h3>
+          <p>🖱 鼠标/手指拖动 - 移动战机</p>
+          <p>⌨ WASD / 方向键 - 移动战机</p>
+          <p>💣 空格键 / 点击 - 释放炸弹</p>
+          <p>⏸ ESC / P键 - 暂停游戏</p>
+        </div>
+        <button class="cyber-btn back-btn" data-action="back-menu">← 返 回</button>
+      </div>
+
+      <!-- 游戏 HUD -->
+      <div id="game-hud" class="screen hud">
+        <div class="hud-top">
+          <div class="hud-left">
+            <div class="score-display">
+              <span class="label">得分</span>
+              <span id="score-value" class="value">0</span>
+            </div>
+            <div class="combo-display" id="combo-display">
+              <span id="combo-value">x1</span>
+              <span class="label">连击</span>
+            </div>
+          </div>
+          <div class="hud-right">
+            <div class="wave-display">
+              <span class="label">波数</span>
+              <span id="wave-value" class="value">1</span>
+            </div>
+          </div>
+        </div>
+        <div class="hud-stats">
+          <div class="stat-row">
+            <div class="stat hp-stat">
+              <span class="stat-label">生命</span>
+              <div id="hp-hearts" class="hearts">♥♥♥</div>
+            </div>
+            <div class="stat bomb-stat">
+              <span class="stat-label">炸弹</span>
+              <span id="bomb-count" class="bomb-count">2</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat shield-stat">
+              <span class="stat-label">护盾</span>
+              <div class="shield-bar"><div id="shield-fill" class="shield-fill"></div></div>
+            </div>
+            <div class="stat power-stat">
+              <span class="stat-label">火力</span>
+              <span id="power-level" class="power-level">Lv.1</span>
+            </div>
+          </div>
+        </div>
+        <div class="hud-bottom">
+          <button id="pause-btn" class="icon-btn hud-btn" title="暂停">⏸</button>
+          <button id="bomb-btn" class="icon-btn hud-btn bomb" title="炸弹">💣</button>
+        </div>
+        <div id="boss-hp-bar" class="boss-hp-bar hidden">
+          <div class="boss-name" id="boss-name">BOSS</div>
+          <div class="boss-hp-outer">
+            <div class="boss-hp-inner" id="boss-hp-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boss 警告 -->
+      <div id="boss-warning" class="screen boss-warning hidden">
+        <div class="warning-content">
+          <div class="warning-text red-flash">⚠ 警 告 ⚠</div>
+          <div class="boss-name-large" id="warning-boss-name">BOSS 来 袭</div>
+          <div class="warning-text red-flash">⚠ WARNING ⚠</div>
+        </div>
+      </div>
+
+      <!-- 暂停界面 -->
+      <div id="pause-screen" class="screen pause-screen hidden">
+        <div class="pause-panel">
+          <h2>游 戏 暂 停</h2>
+          <button class="cyber-btn primary" data-action="resume">继 续 游 戏</button>
+          <button class="cyber-btn" data-action="restart">重 新 开 始</button>
+          <button class="cyber-btn" data-action="quit">返 回 主 菜 单</button>
+        </div>
+      </div>
+
+      <!-- 游戏结束 -->
+      <div id="gameover-screen" class="screen gameover-screen hidden">
+        <div class="gameover-panel">
+          <h2 class="gameover-title">任 务 失 败</h2>
+          <div class="result-stats">
+            <div class="result-row">
+              <span>最终得分</span>
+              <span id="final-score" class="highlight">0</span>
+            </div>
+            <div class="result-row">
+              <span>最高连击</span>
+              <span id="final-combo">0</span>
+            </div>
+            <div class="result-row">
+              <span>击杀数</span>
+              <span id="final-kills">0</span>
+            </div>
+            <div class="result-row">
+              <span>历史最高</span>
+              <span id="high-score" class="highlight">0</span>
+            </div>
+            <div id="new-record" class="new-record hidden">🎉 新 纪 录 !</div>
+          </div>
+          <button class="cyber-btn primary" data-action="retry">再 来 一 局</button>
+          <button class="cyber-btn" data-action="quit">返 回 主 菜 单</button>
+        </div>
+      </div>
+
+      <!-- 关卡通关 -->
+      <div id="level-complete" class="screen level-complete hidden">
+        <div class="complete-panel">
+          <h2 class="complete-title">关 卡 通 过 !</h2>
+          <div class="stars" id="stars-display">★★★</div>
+          <div class="result-stats">
+            <div class="result-row">
+              <span>关卡得分</span>
+              <span id="level-score" class="highlight">0</span>
+            </div>
+            <div class="result-row">
+              <span>用时</span>
+              <span id="level-time">00:00</span>
+            </div>
+          </div>
+          <button class="cyber-btn primary" data-action="next-level">下 一 关</button>
+          <button class="cyber-btn" data-action="quit">返 回 主 菜 单</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/utils/constants.js"></script>
+  <script src="js/utils/utils.js"></script>
+  <script src="js/game/Input.js"></script>
+  <script src="js/game/ParticleSystem.js"></script>
+  <script src="js/game/Audio.js"></script>
+  <script src="js/game/Renderer.js"></script>
+  <script src="js/entities/Particle.js"></script>
+  <script src="js/entities/Bullet.js"></script>
+  <script src="js/entities/PowerUp.js"></script>
+  <script src="js/entities/Enemy.js"></script>
+  <script src="js/entities/Boss.js"></script>
+  <script src="js/entities/Player.js"></script>
+  <script src="js/ui/Menu.js"></script>
+  <script src="js/ui/HUD.js"></script>
+  <script src="js/game/Game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
