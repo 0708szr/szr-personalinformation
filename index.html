@@ -5161,7 +5161,7 @@
             GALLERY_PHOTOS.forEach((src, i) => {
                 const card = document.createElement('div');
                 card.className = 'gallery-card hidden';
-                card.innerHTML = `<img src="${src}" alt="帅照 ${i+1}" draggable="false" onerror="this.parentElement.style.display='none'">`;
+                card.innerHTML = `<img data-src="${src}" alt="照片记录 ${i+1}" draggable="false" loading="lazy" decoding="async" onerror="this.parentElement.style.display='none'">`;
                 card.addEventListener('click', () => {
                     if (card.classList.contains('left')) galleryPrev();
                     else if (card.classList.contains('right')) galleryNext();
@@ -5205,6 +5205,15 @@
             _galleryCards.forEach((card, i) => {
                 card.className = 'gallery-card';
                 const offset = ((i - _galleryIndex + n) % n);
+                // 只加载当前及屏幕上可见的相邻照片，避免移动端一次解码 14 张大图。
+                if (offset <= 2 || offset >= n - 2) {
+                    const img = card.querySelector('img');
+                    if (img && !img.src && img.dataset.src) {
+                        img.fetchPriority = offset === 0 ? 'high' : 'low';
+                        img.src = img.dataset.src;
+                        if (img.decode) img.decode().catch(() => {});
+                    }
+                }
                 if (offset === 0) card.classList.add('center');
                 else if (offset === 1) card.classList.add('right');
                 else if (offset === n - 1) card.classList.add('left');

@@ -33,3 +33,26 @@ html{overflow-x:clip}img,video,svg{max-width:100%;height:auto}button,a{touch-act
 #skillsContainer .skill-tags .tag{transition:transform .22s ease,border-color .22s ease,color .22s ease}
 #skillsContainer .learning-detail-link span:last-child{display:grid;place-items:center;width:28px;height:28px;border:1px solid color-mix(in srgb,var(--primary,#c7aa76) 38%,var(--line,#2b2e30));border-radius:50%;transition:transform .22s ease,background .22s ease}
 @media (max-width:768px){#skillsContainer .skill-area{cursor:pointer}#skillsContainer .skill-area:active{transform:scale(.985)}#skillsContainer .skill-label{margin-bottom:4px!important}}
+
+/* Keep carousel controls above the pointer-reactive layer. */
+.cert-carousel.pointer-reactive>.cert-carousel-btn{position:absolute;z-index:6}
+.cert-carousel.pointer-reactive>.cert-carousel-btn.prev{left:12px}
+.cert-carousel.pointer-reactive>.cert-carousel-btn.next{right:12px}
+
+/* All three game entries share the same gold visual language. */
+#gameCards .game-card,
+#gameCards .game-card.active,
+[data-theme="dark"] #gameCards .game-card,
+[data-theme="dark"] #gameCards .game-card.active{
+  border-color:color-mix(in srgb,var(--primary,#c7aa76) 58%,var(--border,#2b2e30))!important;
+  background:color-mix(in srgb,var(--primary,#c7aa76) 9%,var(--bg-card,#17191b))!important;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--primary,#c7aa76) 12%,transparent)!important
+}
+#gameCards .game-card:hover{
+  border-color:var(--primary,#c7aa76)!important;
+  box-shadow:0 16px 34px rgba(0,0,0,.18),inset 0 1px 0 color-mix(in srgb,var(--primary,#c7aa76) 18%,transparent)!important
+}
+@media (max-width:768px){
+  .cert-carousel.pointer-reactive>.cert-carousel-btn.prev{left:6px}
+  .cert-carousel.pointer-reactive>.cert-carousel-btn.next{right:6px}
+}
